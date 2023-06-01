@@ -36,7 +36,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
 
-
 app.use('/recipe', require('./routes/recipes'));
 app.use('/register', require('./routes/register'));
 app.use('/login', require('./routes/auth'));
