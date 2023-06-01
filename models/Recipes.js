@@ -17,6 +17,9 @@ const RecipeSchema = new Schema({
     recipeIngredients: {
         type:Array,
     },
+    recipeCategorys:{
+        type:Array,
+    },
     recipeDifficulty: {
         type:String,
         default: "Easy",

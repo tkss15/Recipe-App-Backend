@@ -12,23 +12,24 @@ const createRecipe = async(req,res) => {
     if(!req.file)
         return res.status(400).json({"message" : "Missing required fields in order to continue2"})
     if(
-        // !req?.body?.author ||  
+        !req?.body?.author ||  
         !req?.body?.recipename ||
         !req?.body?.recipedescription||
         !req?.body?.recipeingredients||
         !req?.body?.recipedifficulty||
         !req?.body?.recipecallories||
+        !req?.body?.recipecatagorys||
         !req?.body?.recipeTime 
         )
         return res.status(400).json({"message" : "Missing required fields in order to continue"})
     const {path:image} = req.file;
     try {
         const result = await Recipe.create({
-            // author: req.body.author,
-            author: "Production2",
+             author: req.body.author,
             recipeName: req.body.recipename,
             recipeDescription: req.body.recipedescription,
             recipeIngredients: req.body.recipeingredients,
+            recipeCategorys: req.body.recipecatagorys,
             recipeDifficulty: req.body.recipedifficulty,
             recipeCallories: req.body.recipecallories,
             recipeTime: req.body.recipeTime,
@@ -55,6 +56,7 @@ const updateRecipe = async(req,res) => {
     if(req.body?.recipeName)        findRecipe.recipeName = req.body.recipeName;
     if(req.body?.recipeDescription) findRecipe.recipeDescription = req.body.recipeDescription
     if(req.body?.recipeIngredients) findRecipe.recipeIngredients = req.body.recipeIngredients
+    if(req.body?.recipeCategorys)   findRecipe.recipeTime = req.body.recipeCategorys
     if(req.body?.recipeDifficulty)  findRecipe.recipeDifficulty = req.body.recipeDifficulty
     if(req.body?.recipeTime)   findRecipe.recipeTime = req.body.recipeTime
     if(req.body?.recipeCallories)   findRecipe.recipeCallories = req.body.recipeCallories
