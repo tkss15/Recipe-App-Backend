@@ -8,9 +8,6 @@ const getAllRecipes = async (req,res) => {
 }
 
 const createRecipe = async(req,res) => {
-    console.log(req.file);
-    if(!req.file)
-        return res.status(400).json({"message" : "Missing required fields in order to continue2"})
     if(
         !req?.body?.author ||  
         !req?.body?.recipename ||
@@ -19,7 +16,8 @@ const createRecipe = async(req,res) => {
         !req?.body?.recipedifficulty||
         !req?.body?.recipecallories||
         !req?.body?.recipecatagorys||
-        !req?.body?.recipeTime 
+        !req?.body?.recipeTime ||
+        !req.file
         )
         return res.status(400).json({"message" : "Missing required fields in order to continue"})
     const {path:image} = req.file;
