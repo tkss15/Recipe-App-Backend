@@ -30,6 +30,10 @@ const RecipeSchema = new Schema({
     recipeTime: {
         type:String,
     },
+    recipeRating: {
+        type:Number,
+        default: 0
+    },
     createdAt: {
         type: Date,
         default: Date.now,

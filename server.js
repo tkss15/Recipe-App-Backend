@@ -36,11 +36,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
 
-app.use('/recipe', require('./routes/recipes'));
 app.use('/register', require('./routes/register'));
 app.use('/login', require('./routes/auth'));
 app.use('/logout', require('./routes/logout'));
 app.use('/refresh', require('./routes/refresh'));
+app.use('/recipe', require('./routes/recipes'));
+app.use('/comments', require('./routes/comments'));
 
 mongoose.connection.once('open', () => {
     app.listen(PORT, ()=> {

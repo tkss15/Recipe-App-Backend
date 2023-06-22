@@ -7,9 +7,18 @@ const getAllRecipes = async (req,res) => {
    res.json(recipes);
 }
 
+const getBestRecipes = async(req,res) => {
+    const recipes = await Recipe.find()
+    .sort({recipeRating: -1})
+    .limit(4);
+
+    if(!recipes)
+     return res.status(204).json({'message': 'No recipes'}) 
+    res.json(recipes);
+}
+
 const createRecipe = async(req,res) => {
     if(
-        !req?.body?.author ||  
         !req?.body?.recipename ||
         !req?.body?.recipedescription||
         !req?.body?.recipeingredients||
@@ -23,7 +32,7 @@ const createRecipe = async(req,res) => {
     const {path:image} = req.file;
     try {
         const result = await Recipe.create({
-             author: req.body.author,
+            author: req.user,
             recipeName: req.body.recipename,
             recipeDescription: req.body.recipedescription,
             recipeIngredients: req.body.recipeingredients,
@@ -38,6 +47,7 @@ const createRecipe = async(req,res) => {
         console.log(error);
     }
 }
+
 
 const updateRecipe = async(req,res) => {
     if(!req?.body?.id)
@@ -90,6 +100,7 @@ const getSingleRecipe = async (req,res) => {
 
 module.exports = {
     getAllRecipes,
+    getBestRecipes,
     createRecipe,
     updateRecipe,
     deleteRecipe,
