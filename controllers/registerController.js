@@ -4,44 +4,44 @@ const bcrypt = require('bcrypt')
 const registerUser = async (req,res) => {
     try {
         if(req?.body === undefined)
-            res.status(404).json({"message":"Missing few fields in user register."});
-
-        const {username,pwd,firstname,lastname,email, confirm} = req.body;
-        if(!username ||
-            !pwd ||
-            !firstname ||
-            !lastname ||
-            !email || 
-            !confirm)
-            res.status(404).json({"message":"Missing few fields in user register."});
+        return res.status(404).json({"message":"Missing few fields in user register."});
+       
+        const {username,password,firstname,lastname,email, confirm} = req.body;
+        if(!req?.body?.username ||
+            !req?.body?.password ||
+            !req?.body?.firstname ||
+            !req?.body?.lastname ||
+            !req?.body?.email || 
+            !req?.body?.confirm)
+            return res.status(404).json({"message":"Missing few fields in user register."});
         
-        if(pwd !== confirm)
-            res.status(404).json({"message":"Some fields does not meet the requrements."});
+        if(req?.body?.password !== req?.body?.confirm)
+           return res.status(404).json({"message":"Some fields does not meet the requrements."});
         
-        const duplicatedUser = await User.findOne({username:username});
-        const duplicatedEmail = await User.findOne({email:email});
+        const duplicatedUser = await User.findOne({username:req?.body?.username});
+        const duplicatedEmail = await User.findOne({email:req?.body?.email});
 
         if(duplicatedUser)
-            res.status(409).json({"message":"username taken already please try somthing else."});
+            return res.status(409).json({"message":"username taken already please try somthing else."});
 
         if(duplicatedEmail)
-            res.status(409).json({"message":"email taken already please try somthing else."});
+           return res.status(409).json({"message":"email taken already please try somthing else."});
 
-        const hashedPassword = await bcrypt.hash(pwd, 10);
+        const hashedPassword = await bcrypt.hash(req?.body?.password, 10);
         const result = User.create({
-            username:username,
+            username:req?.body?.username,
             password:hashedPassword,
-            firstname:firstname,
-            lastname:lastname,
-            email:email
+            firstname:req?.body?.firstname,
+            lastname:req?.body?.lastname,
+            email:req?.body?.email,
+            
         });
-        res.status(201).json({"Success": `New user ${username} have been created`});
+        return res.status(201).json({"Success": `New user ${username} have been created`});
     }
     catch(error)
     {
-        res.status(500).json({'message': error.message});
+        return res.status(500).json({'message': error.message});
     }
-    
 }
 
 module.exports = {registerUser};

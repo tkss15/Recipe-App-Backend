@@ -24,13 +24,15 @@ const handleLogout = async(req,res) =>
         foundUser.refreshToken = "";
         await foundUser.save();
     }
-    res.clearCookie('jwt', { httpOnly: true, secure: false, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });
+    res.clearCookie('jwt', { httpOnly: true, secure: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });
     res.sendStatus(204);
 }
 const handleRefresh = async(req,res) => {
     const cookies = req.cookies;
+    console.log('refresh');
     if(!cookies?.jwt)
         return res.sendStatus(401);
+    console.log('refresh2');
     /**
      * if(cookies && cookies.jwt)
      */
@@ -39,7 +41,7 @@ const handleRefresh = async(req,res) => {
     const foundUser = await User.findOne({refreshToken}).exec();
     if(!foundUser)
     {
-        return res.sendStatus(204);
+        return res.sendStatus(403);
     }
     
     jwt.verify(
@@ -63,15 +65,15 @@ const handleLogin = async(req,res) => {
         const {username,pwd} = req.body;
 
         if(!username || !pwd)
-            res.status(400).json({"message":"Missing few fields in user register."}); 
+              return res.status(400).json({"message":"Missing few fields in user register."}); 
         
         const foundUser = await User.findOne({username:username}).exec();
         if(!foundUser) 
-            return res.sendStatus(401);
+            return res.status(401).json({"message":"User not found."});
         
         const isValid = await bcrypt.compare(pwd,foundUser.password);
         if(!isValid)
-            res.status(401).json({"message":"username or password dosent match"});
+           return res.status(401).json({"message":"username or password dosent match."});
 
         const accessToken = createToken({"username": foundUser.username, "firstname": foundUser.firstname,
         "lastname": foundUser.lastname,"email": foundUser.email});
@@ -83,11 +85,11 @@ const handleLogin = async(req,res) => {
         )
         foundUser.refreshToken = refreshToken;
         const result = await foundUser.save();
-        res.cookie('jwt', refreshToken, { httpOnly: true, secure: false, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });
+        res.cookie('jwt', refreshToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });
         res.json({accessToken});
 
     } catch (error) {
-        res.sendStatus(401);
+        return res.sendStatus(401);
     }
 }
 

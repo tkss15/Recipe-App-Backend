@@ -19,6 +19,20 @@ const deleteUser = async(req,res) => {
     console.log(result);
 }
 
+const getUserJWT = async(req,res) => {
+    if(!req.user)
+        return res.status(400).json({ "message": 'User must be logged in' });
+    const user = await User.findOne({ username:req.user}).exec();
+    if(!user)
+    {
+        return res.status(204).json({'message': `Username ${req.params.id} not found` })
+    }
+    // API is avaiable to everyone we will use this as a secert protecter
+    user.password = "SECRET-PASSWORD";
+    user.refreshToken = "SECERT-REFRESH";
+    res.json(user);
+}
+
 const getUser = async(req,res) => {
     if(!req.params?.id)
         return res.status(400).json({ "message": 'User ID required' });
@@ -27,11 +41,16 @@ const getUser = async(req,res) => {
     {
         return res.status(204).json({'message': `User ID ${req.params.id} not found` })
     }
+    // API is avaiable to everyone we will use this as a secert protecter
+    user.password = "SECRET-PASSWORD";
+    user.refreshToken = "SECERT-REFRESH";
+    console.log(user)
     res.json(user);
 }
 
 module.exports = {
     getAllUsers,
     deleteUser,
+    getUserJWT,
     getUser
 }

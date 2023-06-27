@@ -14,7 +14,12 @@ router.route('/')
 
 router.route('/top')
     .get(recipeController.getBestRecipes);
+router.route('/search/:userlimit?')
+        .get(verifyJWT,recipeController.getUserRecipes);
+router.route('/avarage')
+        .get(verifyJWT, recipeController.getUserAvarage);
 router.route('/:id')
-    .get(recipeController.getSingleRecipe)
+    .get(recipeController.getSingleRecipe);
+
 
 module.exports = router; 

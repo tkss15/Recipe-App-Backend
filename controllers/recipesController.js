@@ -1,10 +1,44 @@
 const Recipe = require('../models/Recipes');
+const Comment = require('../models/Comments');
 
 const getAllRecipes = async (req,res) => {
    const recipes = await Recipe.find(); // returns all found recipes.
    if(!recipes)
     return res.status(204).json({'message': 'No recipes'}) 
    res.json(recipes);
+}
+const getUserAvarage = async(req,res) => {
+    if(!req.user)
+        return res.status(404).json({"message":"user is logged out"});
+    const userRecipes = await Recipe.find({author:req.user}); 
+    if(!userRecipes)
+        return res.status(204).json({avarage:0});
+    let countComments = 0;
+    let recipeFinalRating = 0;
+    for await (const singleRecipe of userRecipes) {
+        try {
+            recipeFinalRating += singleRecipe.recipeRating;
+            const comment =  await Comment.find({recipeId:singleRecipe._id}).count().exec();
+            if(comment > 0)
+              countComments += comment;
+        } catch (error) {
+            res.status(500).json({"message":"Server Error Try later"});
+        }
+    }
+    recipeFinalRating = (recipeFinalRating/countComments);
+    res.status(200).json({avarage:recipeFinalRating ? recipeFinalRating : 0})
+}
+const getUserRecipes = async(req,res) => {
+    if(!req.user)
+        return res.status(404).json({"message":"user is logged out"});
+    let limitRecipes = 0;
+    if(req?.params?.userlimit)
+        limitRecipes = req.params.userlimit
+
+    const userRecipes = await Recipe.find({author:req.user}).limit(limitRecipes);
+    if(!userRecipes)
+        return res.status(204).json({'message': 'No recipes'});
+    res.json(userRecipes);
 }
 
 const getBestRecipes = async(req,res) => {
@@ -58,7 +92,12 @@ const updateRecipe = async(req,res) => {
     const findRecipe = await Recipe.findOne({ _id: req.body.id }).exec();
     if(!findRecipe)
     {
-        return res.status(204).json({"message": `Recipe id ${req.body.id} not found`}); 
+        return res.status(400).json({"message": `Recipe id ${req.body.id} not found`}); 
+    }
+
+    if(findRecipe.author !== req.user)
+    {
+        return res.status(401).json({"message": `You have no permissions to edit the recipe`}); 
     }
 
     if(req.body?.recipeName)        findRecipe.recipeName = req.body.recipeName;
@@ -74,6 +113,7 @@ const updateRecipe = async(req,res) => {
 }
 
 const deleteRecipe = async(req,res) => {
+    console.log(req.body)
     if(!req?.body?.id) 
         return res.status(400).json({'message': "Recipe id required"});
 
@@ -82,6 +122,11 @@ const deleteRecipe = async(req,res) => {
     {
         return res.status(204).json({"message": `Recipe id ${req.body.id} not found`}); 
     }
+    if(findRecipe.author !== req.user)
+    {
+        return res.status(401).json({"message": `You have no permissions to edit the recipe`}); 
+    }
+    const deleteComments = await Comment.deleteMany({recipeId: findRecipe._id});
     const result = await findRecipe.deleteOne();
     res.json(result);
 }
@@ -100,6 +145,8 @@ const getSingleRecipe = async (req,res) => {
 
 module.exports = {
     getAllRecipes,
+    getUserAvarage,
+    getUserRecipes,
     getBestRecipes,
     createRecipe,
     updateRecipe,

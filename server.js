@@ -42,6 +42,7 @@ app.use('/logout', require('./routes/logout'));
 app.use('/refresh', require('./routes/refresh'));
 app.use('/recipe', require('./routes/recipes'));
 app.use('/comments', require('./routes/comments'));
+app.use('/user', require('./routes/users'));
 
 mongoose.connection.once('open', () => {
     app.listen(PORT, ()=> {
