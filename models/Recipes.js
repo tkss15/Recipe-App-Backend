@@ -34,6 +34,10 @@ const RecipeSchema = new Schema({
         type:Number,
         default: 0
     },
+    recipeComments: {
+        type:Number,
+        default:0
+    },
     createdAt: {
         type: Date,
         default: Date.now,

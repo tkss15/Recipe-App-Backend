@@ -20,7 +20,7 @@ const getUserAvarage = async(req,res) => {
             recipeFinalRating += singleRecipe.recipeRating;
             const comment =  await Comment.find({recipeId:singleRecipe._id}).count().exec();
             if(comment > 0)
-              countComments += comment;
+              countComments += comment
         } catch (error) {
             res.status(500).json({"message":"Server Error Try later"});
         }
@@ -103,7 +103,7 @@ const updateRecipe = async(req,res) => {
     if(req.body?.recipeName)        findRecipe.recipeName = req.body.recipeName;
     if(req.body?.recipeDescription) findRecipe.recipeDescription = req.body.recipeDescription
     if(req.body?.recipeIngredients) findRecipe.recipeIngredients = req.body.recipeIngredients
-    if(req.body?.recipeCategorys)   findRecipe.recipeTime = req.body.recipeCategorys
+    if(req.body?.recipeCategorys)   findRecipe.recipeCategorys = req.body.recipeCategorys
     if(req.body?.recipeDifficulty)  findRecipe.recipeDifficulty = req.body.recipeDifficulty
     if(req.body?.recipeTime)   findRecipe.recipeTime = req.body.recipeTime
     if(req.body?.recipeCallories)   findRecipe.recipeCallories = req.body.recipeCallories

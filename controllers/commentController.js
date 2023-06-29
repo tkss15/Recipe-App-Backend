@@ -25,7 +25,54 @@ const getRecipeComments = async (req,res) => {
     res.json(comments);
  }
 
- const postRecipeComment = async(req,res) => {
+ const updateComment = async(req,res) => {
+    if(!req?.params?.id)
+    {
+        return res.status(400).json({"message": "id of comment is required"})
+    }
+
+    const findComment = await Comment.findOne({ _id: req.params.id }).exec();
+    if(!findComment)
+    {
+        return res.status(400).json({"message": `Comment id ${req.params.id} not found`}); 
+    }
+    if(findComment.author !== req.user)
+    {
+        return res.status(401).json({"message": `You have no permissions to edit the recipe`}); 
+    }
+    const findRecipe = await Recipe.findOne({_id: findComment.recipeId}).exec();
+    findRecipe.recipeRating += (findComment.comment - req.body.data?.comment);
+    if(req.body?.data?.comment)       findComment.comment = req.body.data?.comment;
+    if(req.body?.data?.rating)        findComment.rating = req.body.data?.rating;
+
+    const result = await findComment.save();
+    res.json(result);
+}
+
+const deleteComment = async(req,res) => {
+    if(!req?.params?.id) 
+        return res.status(400).json({'message': "Comment id required"});
+
+    const findComment = await Comment.findOne({ _id: req.params.id }).exec();
+    if(!findComment) 
+    {
+        return res.status(204).json({"message": `Comment id ${req.params.id} not found`}); 
+    }
+    if(findComment.author !== req.user)
+    {
+        return res.status(401).json({"message": `You have no permissions to delete the comment`}); 
+    }
+    const findRecipe = await Recipe.findOne({_id: findComment.recipeId}).exec();
+    findRecipe.recipeComments -= 1;
+    findRecipe.recipeRating -= findComment.rating;
+    await findRecipe.save();
+
+    console.log(findComment);
+    const result = await findComment.deleteOne();
+    res.json(result);
+}
+
+const postRecipeComment = async(req,res) => {
     if(!req.params?.id)
         return res.status(400).json({ "message": 'recipe id required' });
 
@@ -44,7 +91,7 @@ const getRecipeComments = async (req,res) => {
                 comment: req.body.comment,
                 rating: req.body.rating
             });
-
+            findRecipe.recipeComments += 1;
             findRecipe.recipeRating += req.body.rating;
             await findRecipe.save();
             res.status(201).json(result);
@@ -56,5 +103,7 @@ const getRecipeComments = async (req,res) => {
  module.exports = {
     postRecipeComment,
     getUserComments,
-    getRecipeComments
+    getRecipeComments,
+    updateComment,
+    deleteComment
 }

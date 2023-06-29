@@ -11,5 +11,7 @@ router.route('/')
 router.route('/:id')
     .get(commentsController.getRecipeComments)
     .post(verifyJWT, commentsController.postRecipeComment)
+    .delete(verifyJWT, commentsController.deleteComment)
+    .put(verifyJWT, commentsController.updateComment)
 
 module.exports = router; 
