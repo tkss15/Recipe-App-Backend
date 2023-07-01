@@ -68,9 +68,12 @@ const getRecipeComments = async (req,res) => {
         return res.status(401).json({"message": `You have no permissions to edit the recipe`}); 
     }
     const findRecipe = await Recipe.findOne({_id: findComment.recipeId}).exec();
-    findRecipe.recipeRating += (findComment.comment - req.body.data?.comment);
     if(req.body?.data?.comment)       findComment.comment = req.body.data?.comment;
-    if(req.body?.data?.rating)        findComment.rating = req.body.data?.rating;
+    if(req.body?.data?.rating)        
+    {
+        findRecipe.recipeRating += (req.body?.data?.rating - findComment.rating);
+        findComment.rating = req.body.data?.rating;
+    }
 
     const result = await findComment.save();
     res.json(result);
