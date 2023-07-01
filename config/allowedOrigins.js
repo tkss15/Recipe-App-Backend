@@ -1,6 +1,5 @@
 const allowedOrigins = [
-    'http://localhost:3000',
-    'http://localhost:3500'
+    'recipe-qn64tbvnx-tkss15.vercel.app'
 ];
 
 
