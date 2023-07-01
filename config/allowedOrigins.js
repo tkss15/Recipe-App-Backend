@@ -1,5 +1,5 @@
 const allowedOrigins = [
-    'recipe-qn64tbvnx-tkss15.vercel.app'
+    'https://recipe-app-tkss15.vercel.app'
 ];
 
 
