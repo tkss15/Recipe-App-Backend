@@ -24,6 +24,13 @@ const userSchema = new Schema({
         unique: true,
         required: true,
     },
+    roles: {
+        User: { 
+            type: Number,
+            default: 80085
+        },
+        Admin: Number
+    },
     createdAt: {
         type: Date,
         default: Date.now,

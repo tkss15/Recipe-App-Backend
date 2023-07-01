@@ -16,6 +16,32 @@ const getUserComments = async(req,res) => {
 }
 
 
+const getUserAllComments = async(req,res) => { 
+    if(!req.params?.id)
+        return res.status(400).json({ "message": 'user id required' });
+    console.log(req.params.id);
+    try {
+        const comments = await Comment.find({author: req.params.id}).sort({createdAt: -1}).exec();
+    
+        if(!comments)
+            return res.status(204).json({"message": "No comments"});
+        
+        console.log(comments);
+
+        let commentsRecipes = [];
+        await Promise.all(comments.map( async(comment) => {
+                const recipe =  await Recipe.find({ _id:comment.recipeId});
+                if(recipe)
+                    commentsRecipes.push({comment, recipe:{...recipe}});
+        }));
+        console.log(commentsRecipes);
+        res.json(commentsRecipes);
+        
+    } catch (error) {
+        res.status(500).json(error.message);
+    }
+}
+
 const getRecipeComments = async (req,res) => {
     if(!req.params?.id)
         return res.status(400).json({ "message": 'recipe id required' });
@@ -102,6 +128,7 @@ const postRecipeComment = async(req,res) => {
 
  module.exports = {
     postRecipeComment,
+    getUserAllComments,
     getUserComments,
     getRecipeComments,
     updateComment,

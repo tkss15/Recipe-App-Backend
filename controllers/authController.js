@@ -29,14 +29,10 @@ const handleLogout = async(req,res) =>
 }
 const handleRefresh = async(req,res) => {
     const cookies = req.cookies;
-    console.log('refresh');
+
     if(!cookies?.jwt)
         return res.sendStatus(401);
-    console.log('refresh2');
-    /**
-     * if(cookies && cookies.jwt)
-     */
-    
+
     const refreshToken = cookies.jwt;
     const foundUser = await User.findOne({refreshToken}).exec();
     if(!foundUser)
@@ -51,10 +47,15 @@ const handleRefresh = async(req,res) => {
             if(err || foundUser.username !== decoded.username)
                 return res.sendStatus(403);
             
-            const accessToken = createToken({"username": foundUser.username, "firstname": foundUser.firstname,
-            "lastname": foundUser.lastname,"email": foundUser.email});
+            const roles = Object.values(foundUser.roles);
+            const accessToken = createToken({
+                "username": decoded.username, 
+                "firstname": decoded.firstname,
+                "lastname": decoded.lastname,
+                "email": decoded.email, 
+                "roles": roles});
         
-            res.status(200).json({accessToken});
+            res.status(200).json({roles,accessToken});
         }
     );
     
@@ -74,9 +75,14 @@ const handleLogin = async(req,res) => {
         const isValid = await bcrypt.compare(pwd,foundUser.password);
         if(!isValid)
            return res.status(401).json({"message":"username or password dosent match."});
-
-        const accessToken = createToken({"username": foundUser.username, "firstname": foundUser.firstname,
-        "lastname": foundUser.lastname,"email": foundUser.email});
+        
+        const roles = Object.values(foundUser.roles).filter(Boolean);
+        const accessToken = createToken({
+            "username": foundUser.username, 
+            "firstname": foundUser.firstname,
+            "lastname": foundUser.lastname,
+            "email": foundUser.email, 
+            "roles":roles});
 
         const refreshToken = jwt.sign(
             {"username": foundUser.username},
@@ -86,10 +92,10 @@ const handleLogin = async(req,res) => {
         foundUser.refreshToken = refreshToken;
         const result = await foundUser.save();
         res.cookie('jwt', refreshToken, { httpOnly: true, secure: true, sameSite: 'None', maxAge: 24 * 60 * 60 * 1000 });
-        res.json({accessToken});
+        res.json({accessToken, roles});
 
     } catch (error) {
-        return res.sendStatus(401);
+        return res.status(500).json({"message":error.message});
     }
 }
 

@@ -21,6 +21,8 @@ const PORT = process.env.SERVER_PORT || 3500;
 // Connect to the Mongodb.
 connectDB();
 
+const verifyJWT = require('./middleware/verfiyJWT')
+
 /*****************************
  *        Middleware.
  *****************************/
@@ -42,7 +44,20 @@ app.use('/logout', require('./routes/logout'));
 app.use('/refresh', require('./routes/refresh'));
 app.use('/recipe', require('./routes/recipes'));
 app.use('/comments', require('./routes/comments'));
+app.use(verifyJWT);
 app.use('/user', require('./routes/users'));
+
+
+
+app.all('*', (req, res) => {
+    res.status(404);
+    if (req.accepts('json')) {
+        res.json({ "error": "404 Not Found" });
+    } else {
+        res.type('txt').send("404 Not Found");
+    }
+});
+
 
 mongoose.connection.once('open', () => {
     app.listen(PORT, ()=> {

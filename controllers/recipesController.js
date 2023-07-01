@@ -1,5 +1,6 @@
 const Recipe = require('../models/Recipes');
 const Comment = require('../models/Comments');
+const ROLES_LIST = require('../config/rolesList');
 
 const getAllRecipes = async (req,res) => {
    const recipes = await Recipe.find(); // returns all found recipes.
@@ -78,7 +79,7 @@ const createRecipe = async(req,res) => {
         });
         res.status(201).json(result);
     } catch (error) {
-        console.log(error);
+        res.status(500).json({"message": error.message}); 
     }
 }
 
@@ -122,9 +123,13 @@ const deleteRecipe = async(req,res) => {
     {
         return res.status(204).json({"message": `Recipe id ${req.body.id} not found`}); 
     }
-    if(findRecipe.author !== req.user)
+    console.log(req.roles.includes(ROLES_LIST.Admin));
+    if(req.roles.includes(ROLES_LIST.Admin) !== true)
     {
-        return res.status(401).json({"message": `You have no permissions to edit the recipe`}); 
+        if(findRecipe.author !== req.user)
+        {
+            return res.status(401).json({"message": `You have no permissions to delete the recipe`}); 
+        }
     }
     const deleteComments = await Comment.deleteMany({recipeId: findRecipe._id});
     const result = await findRecipe.deleteOne();
