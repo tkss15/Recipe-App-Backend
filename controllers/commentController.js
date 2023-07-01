@@ -1,5 +1,6 @@
 const Comment = require('../models/Comments.js');
 const Recipe = require('../models/Recipes.js')
+const ROLES_LIST = require('../config/rolesList');
 
 const getUserComments = async(req,res) => { 
     const comments = await Comment.find({author: req.user}).sort({createdAt: -1}).limit(3).exec();
@@ -84,13 +85,18 @@ const deleteComment = async(req,res) => {
     {
         return res.status(204).json({"message": `Comment id ${req.params.id} not found`}); 
     }
-    if(findComment.author !== req.user)
+    if(req.roles.includes(ROLES_LIST.Admin) !== true)
     {
-        return res.status(401).json({"message": `You have no permissions to delete the comment`}); 
+        if(findComment.author !== req.user)
+        {
+            return res.status(401).json({"message": `You have no permissions to delete the comment`}); 
+        }
     }
     const findRecipe = await Recipe.findOne({_id: findComment.recipeId}).exec();
-    findRecipe.recipeComments -= 1;
-    findRecipe.recipeRating -= findComment.rating;
+    if(findRecipe.recipeComments > 0)
+        findRecipe.recipeComments -= 1;
+    if(findRecipe.recipeRating > 0)
+        findRecipe.recipeRating -= findComment.rating;
     await findRecipe.save();
 
     console.log(findComment);

@@ -114,7 +114,6 @@ const updateRecipe = async(req,res) => {
 }
 
 const deleteRecipe = async(req,res) => {
-    console.log(req.body)
     if(!req?.body?.id) 
         return res.status(400).json({'message': "Recipe id required"});
 
@@ -123,7 +122,6 @@ const deleteRecipe = async(req,res) => {
     {
         return res.status(204).json({"message": `Recipe id ${req.body.id} not found`}); 
     }
-    console.log(req.roles.includes(ROLES_LIST.Admin));
     if(req.roles.includes(ROLES_LIST.Admin) !== true)
     {
         if(findRecipe.author !== req.user)
