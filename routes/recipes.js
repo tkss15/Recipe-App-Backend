@@ -5,10 +5,11 @@ const verifyJWT = require('../middleware/verfiyJWT')
 // Controller.
 const recipeController = require('../controllers/recipesController');
 const upload = require('../middleware/upload')
+const uniqeFile = require('../middleware/uniqeFile')
 
 router.route('/')
     .get(recipeController.getAllRecipes)
-    .post(upload.single('uploadedImage'), verifyJWT, recipeController.createRecipe)
+    .post(uniqeFile,upload.single('uploadedImage'), verifyJWT, recipeController.createRecipe)
     .put(verifyJWT,recipeController.updateRecipe)
     .delete(verifyJWT,recipeController.deleteRecipe);
 

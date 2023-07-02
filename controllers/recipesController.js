@@ -64,6 +64,7 @@ const createRecipe = async(req,res) => {
         !req.file
         )
         return res.status(400).json({"message" : "Missing required fields in order to continue"})
+    console.log(req.imageId);
     const {path:image} = req.file;
     try {
         const result = await Recipe.create({
