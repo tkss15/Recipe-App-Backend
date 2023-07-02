@@ -1,11 +1,10 @@
-const uuid = require('uuid');
+const {v4:uuidv4} = require('uuid');
+const crypto = require("crypto");
 
 const uniqeFile = (req,res,next) => {
-    if(req.file)
-    {
-        const uuid4 = uuid.v4()
-        req.imageId = uuid4;
-    }
+    const id = crypto.randomBytes(16).toString("hex");
+    req.imageId = id;
+    next();
 }
 
 module.exports = uniqeFile;
