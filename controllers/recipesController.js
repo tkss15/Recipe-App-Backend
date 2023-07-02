@@ -76,7 +76,7 @@ const createRecipe = async(req,res) => {
             recipeDifficulty: req.body.recipedifficulty,
             recipeCallories: req.body.recipecallories,
             recipeTime: req.body.recipeTime,
-            Image: image.replace('\\', "/")
+            Image: req.imageId
         });
         res.status(201).json(result);
     } catch (error) {
