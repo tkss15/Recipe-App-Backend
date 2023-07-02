@@ -66,6 +66,7 @@ const createRecipe = async(req,res) => {
         )
         return res.status(400).json({"message" : "Missing required fields in order to continue"})
     try {
+        console.log(req.fileName)
         const result = await Recipe.create({
             author: req.user,
             recipeName: req.body.recipename,
