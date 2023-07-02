@@ -2,6 +2,7 @@ const Recipe = require('../models/Recipes');
 const Comment = require('../models/Comments');
 const ROLES_LIST = require('../config/rolesList');
 
+
 const getAllRecipes = async (req,res) => {
    const recipes = await Recipe.find(); // returns all found recipes.
    if(!recipes)
@@ -64,8 +65,6 @@ const createRecipe = async(req,res) => {
         !req.file
         )
         return res.status(400).json({"message" : "Missing required fields in order to continue"})
-    console.log(req.imageId);
-    const {path:image} = req.file;
     try {
         const result = await Recipe.create({
             author: req.user,
@@ -76,7 +75,7 @@ const createRecipe = async(req,res) => {
             recipeDifficulty: req.body.recipedifficulty,
             recipeCallories: req.body.recipecallories,
             recipeTime: req.body.recipeTime,
-            Image: req.imageId
+            Image: req.fileName
         });
         res.status(201).json(result);
     } catch (error) {
